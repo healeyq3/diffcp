@@ -595,26 +595,34 @@ def solve_and_derivative_internal(A, b, c, cone_dict, solve_method=None,
             perturbations; the sparsity pattern of `dA` matches that of `A`.
         """
 
+        # print("MADE INTO ADJOINT")
+
         dw = -(x @ dx + y @ dy + s @ ds)
         dz = np.concatenate(
             [dx, D_proj_dual_cone.rmatvec(dy + ds) - ds, np.array([dw])])
 
+        resid = 0
         if np.allclose(dz, 0):
             r = np.zeros(dz.shape)
         elif mode == "dense":
             r = _diffcp._solve_adjoint_derivative_dense(M, MT, dz)
         elif mode == "lsqr":
-            r = _diffcp.lsqr(MT, dz).solution
+            r = _diffcp.lsqr(MT, dz, atol=1e-6, btol=1e-6).solution
+            resid = np.linalg.norm(MT.matvec(r) - dz)**2
         elif mode == "lsmr":
             MT_sp = sparse.linalg.LinearOperator(dz.shape*2, matvec=MT.matvec, rmatvec=MT.rmatvec)
             r, istop, itn, normr, normar, norma, conda, normx = sparse.linalg.lsmr(MT_sp, dz, maxiter=10*MT_sp.shape[0], atol=1e-10, btol=1e-10)
 
+        # print("RESIDUAL: ", resid)
         values = pi_z[cols] * r[rows + n] - pi_z[n + rows] * r[cols]
         dA = sparse.csc_matrix((values, (rows, cols)), shape=A.shape)
         db = pi_z[n:n + m] * r[-1] - pi_z[-1] * r[n:n + m]
         dc = pi_z[:n] * r[-1] - pi_z[-1] * r[:n]
 
-        return dA, db, dc
+        if kwargs["return_resid"]:
+            return dA, db, dc, resid
+        else:
+            return dA, db, dc
 
     result["D"] = derivative
     result["DT"] = adjoint_derivative
