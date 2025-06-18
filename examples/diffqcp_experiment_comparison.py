@@ -81,16 +81,17 @@ if __name__ == "__main__":
 
     n=20
 
-    data_load_path = "/home/quill/diffqcp/experiments/results/results_20250615-092317/robust_mvdr/data"
-    exp_results_dir = os.path.join(results_dir, "robust_mvdr")
+    data_load_path = "/home/quill/diffqcp/experiments/results/results_20250617-165045/LS_eq_small_LR/data"
+    
+    exp_results_dir = os.path.join(results_dir, "ls_eq_small")
     os.makedirs(exp_results_dir, exist_ok=True)
     exp_results_dir_plots = os.path.join(exp_results_dir, "plots")
     os.makedirs(exp_results_dir_plots, exist_ok=True)
     experiment = GradDescTestHelper(data_load_path, save_dir=exp_results_dir)
     for i in range(1, num_loop_trials+1):
-        print(f"=== starting diffcp mvdr experiment {i} / {num_loop_trials} ===")
+        print(f"=== starting diffcp LS EQ small experiment {i} / {num_loop_trials} ===")
         experiment_diffcp_result = experiment.cp_grad_desc(step_size=step_size, num_iter=num_iter)
         # save results
-        experiment_diffcp_result.save_result(exp_results_dir, experiment_name="mvdr", experiment_count=i, verbose=True)
+        experiment_diffcp_result.save_result(exp_results_dir, experiment_name="lseqsmall", experiment_count=i, verbose=True)
         diffcp_save_path = os.path.join(exp_results_dir_plots, f"diffcp_experiment_{i}.png")
         experiment_diffcp_result.plot_obj_traj(diffcp_save_path)

@@ -34,5 +34,7 @@ print(dx)
 dx = c
 dy = np.zeros(m)
 ds = np.zeros(m)
-dA, db, dc = DT(dx, dy, ds)
+# dA, db, dc = DT(dx, dy, ds)
+dA, db, dc, resid = DT(dx, dy, ds, return_resid=True)
 print(dc)
+print("resid from hello world: ", resid)

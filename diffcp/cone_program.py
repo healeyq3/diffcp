@@ -607,7 +607,8 @@ def solve_and_derivative_internal(A, b, c, cone_dict, solve_method=None,
         elif mode == "dense":
             r = _diffcp._solve_adjoint_derivative_dense(M, MT, dz)
         elif mode == "lsqr":
-            r = _diffcp.lsqr(MT, dz, atol=1e-6, btol=1e-6).solution
+            # r = _diffcp.lsqr(MT, dz, atol=1e-6, btol=1e-6).solution
+            r = _diffcp.lsqr(MT, dz).solution
             resid = np.linalg.norm(MT.matvec(r) - dz)**2
         elif mode == "lsmr":
             MT_sp = sparse.linalg.LinearOperator(dz.shape*2, matvec=MT.matvec, rmatvec=MT.rmatvec)
